@@ -25,6 +25,11 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
       - name: Verify project ZIP
         run: |
           test -f legend_tv_parts_vault_android_inventory_5.3.0_gallery_ai_search.zip
@@ -34,17 +39,17 @@ jobs:
         run: |
           mkdir project
           unzip -q legend_tv_parts_vault_android_inventory_5.3.0_gallery_ai_search.zip -d project
-          find project -name gradlew -type f -exec chmod +x {} \;
 
       - name: Verify app version
         working-directory: project
         run: |
-          grep -R "versionName '5.3.0'" app/build.gradle
+          grep -F "versionName '5.3.0'" app/build.gradle
+          test -f settings.gradle
+          test -f build.gradle
 
       - name: Build debug APK
         working-directory: project
-        run: |
-          ./gradlew --no-daemon assembleDebug
+        run: gradle --no-daemon assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
