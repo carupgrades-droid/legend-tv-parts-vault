@@ -1,5 +1,5 @@
 
-name: Build Legend TV Parts Vault 5.1.0 Unified Workspace
+name: Build Legend TV Parts Vault 5.2.0
 
 on:
   workflow_dispatch:
@@ -16,15 +16,16 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Extract unified 5.1.0 project
+      - name: Extract 5.2.0 project
         run: |
           set -euo pipefail
-          test -f legend_tv_parts_vault_android_inventory_5.1.0_unified_workspace.zip
-          unzip -o legend_tv_parts_vault_android_inventory_5.1.0_unified_workspace.zip -d .
+          test -f legend_tv_parts_vault_android_inventory_5.2.0_cloud_ai_workspace.zip
+          unzip -o legend_tv_parts_vault_android_inventory_5.2.0_cloud_ai_workspace.zip -d .
           test -f app/build.gradle
           test -f app/src/main/AndroidManifest.xml
-          grep -F "versionName '5.1.0'" app/build.gradle
-          grep -F "versionCode 30" app/build.gradle
+          test -f app/src/main/assets/tv_repair_knowledge_vault_offline.html
+          grep -F "versionName '5.2.0'" app/build.gradle
+          grep -F "versionCode 31" app/build.gradle
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -38,10 +39,10 @@ jobs:
       - name: Build Android APK
         run: gradle assembleDebug
 
-      - name: Upload unified 5.1.0 APK
+      - name: Upload 5.2.0 APK
         uses: actions/upload-artifact@v4
         with:
-          name: legend-tv-parts-vault-5.1.0-unified-apk
+          name: legend-tv-parts-vault-5.2.0-cloud-ai-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
