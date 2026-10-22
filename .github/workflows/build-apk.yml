@@ -1,10 +1,12 @@
 
-name: Build Legend TV Parts Vault 5.2.0
+name: Build Legend TV Parts Vault APK
 
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    paths:
+      - 'legend_tv_parts_vault_android_inventory_5.3.0_gallery_ai_search.zip'
+      - '.github/workflows/build-apk.yml'
 
 permissions:
   contents: read
@@ -12,37 +14,41 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract 5.2.0 project
-        run: |
-          set -euo pipefail
-          test -f legend_tv_parts_vault_android_inventory_5.2.0_cloud_ai_workspace.zip
-          unzip -o legend_tv_parts_vault_android_inventory_5.2.0_cloud_ai_workspace.zip -d .
-          test -f app/build.gradle
-          test -f app/src/main/AndroidManifest.xml
-          test -f app/src/main/assets/tv_repair_knowledge_vault_offline.html
-          grep -F "versionName '5.2.0'" app/build.gradle
-          grep -F "versionCode 31" app/build.gradle
-
-      - name: Set up Java
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - name: Verify project ZIP
+        run: |
+          test -f legend_tv_parts_vault_android_inventory_5.3.0_gallery_ai_search.zip
+          unzip -t legend_tv_parts_vault_android_inventory_5.3.0_gallery_ai_search.zip
 
-      - name: Build Android APK
-        run: gradle assembleDebug
+      - name: Extract Android project
+        run: |
+          mkdir project
+          unzip -q legend_tv_parts_vault_android_inventory_5.3.0_gallery_ai_search.zip -d project
+          find project -name gradlew -type f -exec chmod +x {} \;
 
-      - name: Upload 5.2.0 APK
+      - name: Verify app version
+        working-directory: project
+        run: |
+          grep -R "versionName '5.3.0'" app/build.gradle
+
+      - name: Build debug APK
+        working-directory: project
+        run: |
+          ./gradlew --no-daemon assembleDebug
+
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: legend-tv-parts-vault-5.2.0-cloud-ai-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: legend-tv-parts-vault-5.3.0-gallery-ai-search-apk
+          path: project/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
-          retention-days: 14
