@@ -1,5 +1,5 @@
 
-name: Build Legend TV Parts Vault 4.9.0
+name: Build Legend TV Parts Vault 5.0.0
 
 on:
   workflow_dispatch:
@@ -16,15 +16,15 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Extract 4.9.0 combined project
+      - name: Extract 5.0.0 project
         run: |
-          set -e
-          test -f legend_tv_parts_vault_android_inventory_4.9.0_navigation_fixed.zip
-          unzip -o legend_tv_parts_vault_android_inventory_4.9.0_navigation_fixed.zip -d .
+          set -euo pipefail
+          test -f legend_tv_parts_vault_android_inventory_5.0.0_master_technician.zip
+          unzip -o legend_tv_parts_vault_android_inventory_5.0.0_master_technician.zip -d .
           test -f app/build.gradle
           test -f app/src/main/AndroidManifest.xml
-          grep -F "versionName '4.9.0'" app/build.gradle
-          grep -F "versionCode 28" app/build.gradle
+          grep -F "versionName '5.0.0'" app/build.gradle
+          grep -F "versionCode 29" app/build.gradle
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -38,10 +38,10 @@ jobs:
       - name: Build Android APK
         run: gradle assembleDebug
 
-      - name: Upload Legend TV Parts Vault 4.9.0 APK
+      - name: Upload Legend TV Parts Vault 5.0.0 APK
         uses: actions/upload-artifact@v4
         with:
-          name: legend-tv-parts-vault-4.9.0-apk
+          name: legend-tv-parts-vault-5.0.0-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
