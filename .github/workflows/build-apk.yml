@@ -50,10 +50,18 @@ jobs:
       - name: Build debug APK
         working-directory: project
         run: gradle --no-daemon assembleDebug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: legend-tv-parts-vault-5.3.0-gallery-ai-search-apk
-          path: project/app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
+      - name: Verify APK manifest version
+     working-directory: project
+     run: |
+       APK=$(find app/build/outputs/apk/debug -name '*.apk' -print -quit)
+       test -n "$APK"
+       AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -n 1)
+       test -n "$AAPT"
+       "$AAPT" dump badging "$APK" | tee /tmp/apk-badging.txt
+       grep -F "package: name='com.legendtvparts.repairvault' versionCode='32' versionName='5.3.0'" /tmp/apk-badging.txt
+     -name: Upload APK
+    uses: actions/upload-artifact@v4
+    with:
+     name: legend-tv-parts-vault-5.3.0-gallery-ai-search-apk
+    path: project/app/build/outputs/apk/debug/*.apk
+   if-no-files-found: error
